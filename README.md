@@ -1,11 +1,26 @@
-# Support Bot for Telegram | Feedback Bot Telegram.
+# Feedback Bot Telegram. | Телеграм бот обратной связи.
+***!!!WORKED IN 3.8+ PYTHON VERSION!!!***
+>Hello! This is a simple telegram bot for feedback on inline-buttons with a database.
 
-This is a feedback bot for telegrams with built-in buttons and the ability to ban users.
+**What the bot can do:**
+- **Receive messages from users and help the administration respond to them;**
 
-Installing libraries: 
-    `pip install aiogram`
-    `pip install keyboard`
-    `pip install functions`
+- **Send messages to all bot users;**
+
+- **Block/unblock users;**
 
 
-In the `config.py file`, change the `bot token` to your own, and change the `admin id` to your own (you can also leave 1 user id, then the administrator will also be 1)
+>Привет! Это простой телеграм бот для обратной связи на инлайн-кнопках с базой данных. 
+
+**Что может бот:**
+- **Принимать сообщения от пользователей и помогать администрации отвечать на них;**
+
+- **Рассылать сообщения всем пользователям бота;**
+
+- **Блокировать/разблокировать пользователей;**
+
+>Installing libraries: | Установите библиотеки: 
+    
+    pip install aiogram
+    pip install keyboard
+    pip install functions
