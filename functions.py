@@ -1,9 +1,17 @@
 import sqlite3
 from config import admin
 
-connection = sqlite3.connect('data.db') # подключение к базе данных
+connection = sqlite3.connect('data.db')  # Подключение к базе данных
 q = connection.cursor()
 
+# Создаем таблицу users, если она ещё не существует
+q.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        block INTEGER DEFAULT 0
+    )
+""")
+connection.commit()
 
 def join(chat_id):
     q.execute(f"SELECT * FROM users WHERE user_id = {chat_id}")

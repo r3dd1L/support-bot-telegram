@@ -25,18 +25,31 @@ class st(StatesGroup):
 
 
 @dp.message_handler(commands=['start'])
-async def start(message: types.Message):
+async def start(message: types.Message, state: FSMContext):
     func.join(chat_id=message.chat.id)
     q.execute(f"SELECT block FROM users WHERE user_id = {message.chat.id}")
+    user_name = message.from_user.username if message.from_user.username else "неизвестно"
     result = q.fetchone()
     if result[0] == 0:
-        if message.chat.id in admin:  # Проверка, является ли ID отправителя администратором
-            await message.answer('Добро пожаловать!', reply_markup=kb.menu)
+        if message.chat.id in admin:
+            await message.answer(f"Добро пожаловать, @{user_name}!", reply_markup=kb.menu)
         else:
-            await message.answer('Приветствую тебя! .\nНапиши мне свой вопрос/предложение/просьбу и я отправлю его администрации.\nЗа спам/флуд - вы можете получить как временный, так и вечный ЧС!')
+            # Инлайн-кнопки "О нас", "Правила" и "Сайт"
+            inline_buttons = [
+                types.InlineKeyboardButton("О нас", callback_data="about"),
+                types.InlineKeyboardButton("Правила", callback_data="rules"),
+                types.InlineKeyboardButton("Сайт", url="https://r3dd1l.tk")
+            ]
+            inline_keyboard = types.InlineKeyboardMarkup(row_width=1)
+            inline_keyboard.add(*inline_buttons)
+            
+            # Сообщение с кнопками
+            await message.answer(
+                f"Приветствую тебя, @{user_name}! .\nНапиши мне свой вопрос/предложение/просьбу и я отправлю его администрации.\nЗа спам/флуд - вы можете получить как временный, так и вечный ЧС!",
+                reply_markup=inline_keyboard
+            )
     else:
-        await message.answer('Вы были заблокированны!') # пишет если человек заблокирован
-
+        await message.answer('Вы были заблокированны!')
 
 @dp.message_handler(content_types=['text'], text='👑 Админ-панель')
 async def handfler(message: types.Message, state: FSMContext):
@@ -98,8 +111,9 @@ async def hangdler(message: types.Message, state: FSMContext):
 			await message.answer('Введите текст для рассылки.\n\nДля отмены нажмите на кнопку ниже', reply_markup=kb.back)
 			await st.item.set()
 
+
 @dp.message_handler(content_types=['text'])
-@dp.throttled(func.antiflood, rate=120) #120 - секунды после каждого сообщения пользователя, анти-флуд система.
+@dp.throttled(func.antiflood, rate=120) # 120 - секунды после каждого сообщения пользователя, анти-флуд система.
 async def h(message: types.Message, state: FSMContext):
 	func.join(chat_id=message.chat.id)
 	q.execute(f"SELECT block FROM users WHERE user_id = {message.chat.id}")
@@ -114,6 +128,12 @@ async def h(message: types.Message, state: FSMContext):
 	else:
 		await message.answer('Вы заблокированны в боте.')
 
+@dp.callback_query_handler(lambda call: call.data in ['rules', 'about'], state=None)
+async def inline_button_handler(call: types.CallbackQuery):
+    if call.data == 'rules':
+        await call.message.edit_text("Тут все правила") # Тут правила написать можно
+    elif call.data == 'about':
+        await call.message.edit_text("Мы энтузиасты") # Ну а тут просто кто вы и что вы
 
 @dp.callback_query_handler(lambda call: True) # Inline часть
 async def cal(call, state: FSMContext):
